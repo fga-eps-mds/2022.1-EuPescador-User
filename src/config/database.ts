@@ -1,29 +1,21 @@
-import mongoose from 'mongoose';
+import { DataSource } from 'typeorm';
+import { User } from '../models/user';
 
-const databaseConnect = async () => {
-  try {
-    await mongoose.connect(
-      process.env.MONGODB_URI || 'mongodb://db/fish',
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useFindAndModify: false,
-        useCreateIndex: true,
-      },
-      (err) => {
-        if (!err) {
-          console.log('Conexão estabelecida com sucesso com o MongoDB');
-        } else {
-          console.log(
-            `Falhou a estabelecer a conexão com o MongoDB, falhou com erro: ${err}`
-          );
-        }
+export const connection = new DataSource({
+  type: 'postgres',
+  host: process.env.POSTGRES_HOST || 'db',
+  port: Number(process.env.POSTGRES_PORT) || 5432,
+  username: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  database: process.env.POSTGRES_DB,
+  entities: [User],
+  synchronize: true,
+  logging: false,
+  extra: process.env.POSTGRES_HOST
+    ? {
+        ssl: {
+          rejectUnauthorized: false,
+        },
       }
-    );
-  } catch (error) {
-    console.log('Não foi possível inicicializar corretamente a base de dados!');
-    console.log(error);
-  }
-};
-
-export default databaseConnect;
+    : null,
+});

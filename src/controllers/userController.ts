@@ -1,14 +1,16 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import User from '../models/userModel';
 import AuthUser from '../middleware/authUser';
+import { connection } from '../config/database';
+import { User } from '../models/user';
 
 export default class UserController {
   createUser = async (req: Request, res: Response) => {
     try {
-      const { email, phone } = await req.body;
-      const emailFind = await User.findOne({ email });
-      const phoneFind = await User.findOne({ phone });
+      const { name, email, phone, admin, password, state, city } = await req.body;
+      const userRepository = connection.getRepository(User);
+      const emailFind = await userRepository.findOne({where: {email}});
+      const phoneFind = await userRepository.findOne({where: {phone}});
+
       if (emailFind || phoneFind) {
         return res.status(409).json({
           message: `${
@@ -16,18 +18,27 @@ export default class UserController {
           } já cadastrado`,
         });
       }
-      const user = req.body;
+      const user = new User();
+      user.email = email;
+      user.city = city;
+      user.name = name;
+      user.state = state;
+      user.password = password;
+      user.admin = admin;
+      user.phone = phone;
+      
       if (
         user.admin &&
-        user.token !== process.env.RESEARCHER_CONFIRMATION_CODE
+        req.body.token !== process.env.RESEARCHER_CONFIRMATION_CODE
       ) {
         return res
           .status(401)
           .json({ message: 'Código de pesquisador invalido!' });
       }
-      await User.create(user);
-      user.password = undefined;
-      user.token = undefined;
+
+
+      await userRepository.save(user);
+
       return res.status(200).json(user);
     } catch (error) {
       return res.status(400).json({
@@ -38,7 +49,8 @@ export default class UserController {
 
   getAllUsers = async (res: Response) => {
     try {
-      const data = await User.find({}, 'name email state city phone admin');
+      const userRepository = connection.getRepository(User);
+      const data = await userRepository.find({})
       return res.status(200).json(data);
     } catch (error) {
       return res.status(500).json({
@@ -51,18 +63,21 @@ export default class UserController {
     const { emailPhone, password } = req.body;
     const authenticateUser = new AuthUser();
     try {
+      const userRepository = connection.getRepository(User);
       const user =
-        (await User.findOne({ email: emailPhone }).select('+password')) ||
-        (await User.findOne({ phone: emailPhone }).select('+password'));
+        (await userRepository.findOne({where: {email: emailPhone}})) ||
+        (await userRepository.findOne({where: {phone: emailPhone}}));
+    
       if (!user) {
         return res.status(404).json({
           message: 'Usuário não encontado: Email ou telefone inválido!',
         });
       }
 
-      if (!(await bcrypt.compare(password, user!.password))) {
+      if (password !== user.password) {
         return res.status(401).json({ message: 'Senha inválida' });
       }
+      
       const token = await authenticateUser.generateToken({
         id: user.id,
         email: user.email,

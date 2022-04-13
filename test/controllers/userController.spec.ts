@@ -1,12 +1,12 @@
 import { Response, Request } from 'express';
-import bcrypt from 'bcryptjs';
 import AuthUser from '../../src/middleware/authUser';
 import UserController from '../../src/controllers/userController';
-import User from '../../src/models/userModel';
+import { User } from '../../src/models/user';
+import { connection } from '../../src/config/database';
 
 const userController = new UserController();
 const userMock = {
-  _id: '3472417428',
+  id: '3472417428',
   email: 'natan@gmail.com',
   password: '123',
   phone: '56565777',
@@ -44,9 +44,10 @@ describe('Test Create User function', () => {
     };
 
     const response = mockResponse();
-    User.findOne = jest.fn();
+    const userRepository = connection.getRepository(User);
+    userRepository.findOne = jest.fn();
     jest
-      .spyOn(User, 'create')
+      .spyOn(userRepository, 'save')
       .mockImplementationOnce(() => Promise.resolve({ id: 1 }));
     const res = await userController.createUser(mockRequest, response);
     expect(res.status).toHaveBeenCalledWith(200);
@@ -65,7 +66,8 @@ describe('Test Create User function', () => {
     };
 
     const response = mockResponse();
-    User.findOne = jest.fn().mockImplementationOnce(() => ({
+    const userRepository = connection.getRepository(User);
+    userRepository.findOne = jest.fn().mockImplementationOnce(() => ({
       select: jest.fn().mockResolvedValueOnce(userMock),
     }));
     const res = await userController.createUser(mockRequest, response);
@@ -85,7 +87,8 @@ describe('Test Create User function', () => {
     };
 
     const response = mockResponse();
-    User.findOne = jest.fn().mockImplementationOnce(() => ({
+    const userRepository = connection.getRepository(User);
+    userRepository.findOne = jest.fn().mockImplementationOnce(() => ({
       select: jest.fn().mockResolvedValueOnce(userMock),
     }));
     const res = await userController.createUser(mockRequest, response);
@@ -105,7 +108,8 @@ describe('Test Create User function', () => {
     };
 
     const response = mockResponse();
-    User.findOne = jest.fn();
+    const userRepository = connection.getRepository(User);
+    userRepository.findOne = jest.fn();
     const res = await userController.createUser(mockRequest, response);
     expect(res.status).toHaveBeenCalledWith(401);
   });
@@ -124,8 +128,10 @@ describe('Test Create User function', () => {
     };
 
     const response = mockResponse();
+    const userRepository = connection.getRepository(User);
+
     jest
-      .spyOn(User, 'create')
+      .spyOn(userRepository, 'save')
       .mockImplementationOnce(() =>
         Promise.reject(Error('Usuário já existente!'))
       );
@@ -137,14 +143,18 @@ describe('Test Create User function', () => {
 describe('Test Get All Users function', () => {
   it('should get a statusCode 200 if request succeed', async () => {
     const response = mockResponse();
-    User.find = jest.fn().mockResolvedValueOnce([userMock]);
+    const userRepository = connection.getRepository(User);
+
+    userRepository.find = jest.fn().mockResolvedValueOnce([userMock]);
     const res = await userController.getAllUsers(response);
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
   it('should get a statusCode 500 if request failed', async () => {
     const response = mockResponse();
-    User.find = jest
+    const userRepository = connection.getRepository(User);
+
+    userRepository.find = jest
       .fn()
       .mockImplementationOnce(() =>
         Promise.reject(Error('Falha na requisição!'))
@@ -159,14 +169,15 @@ describe('Test Login function', () => {
     const mockRequest = {} as Request;
     mockRequest.body = {
       emailPhone: 'batista@sugardaddy.com',
-      password: '12345678',
+      password: '123',
     };
 
     const response = mockResponse();
-    User.findOne = jest.fn().mockImplementationOnce(() => ({
+    const userRepository = connection.getRepository(User);
+
+    userRepository.findOne = jest.fn().mockImplementationOnce(() => ({
       select: jest.fn().mockResolvedValueOnce(userMock),
     }));
-    jest.spyOn(bcrypt, 'compare').mockImplementationOnce(() => true);
     jest
       .spyOn(AuthUser.prototype, 'generateToken')
       .mockImplementationOnce(() => 'mockToken');
@@ -178,19 +189,20 @@ describe('Test Login function', () => {
     const mockRequest = {} as Request;
     mockRequest.body = {
       emailPhone: 'batista@sugardaddy.com',
-      password: '12345678',
+      password: '123',
     };
 
     const response = mockResponse();
-    User.findOne = jest.fn().mockImplementationOnce(() => ({
+    const userRepository = connection.getRepository(User);
+
+    userRepository.findOne = jest.fn().mockImplementationOnce(() => ({
       select: jest.fn().mockResolvedValueOnce(userMock),
     }));
-    jest.spyOn(bcrypt, 'compare').mockImplementationOnce(() => false);
     const res = await userController.login(mockRequest, response);
     expect(res.status).toHaveBeenCalledWith(401);
   });
 
-  it('should get a statusCode 500 if request failed', async () => {
+  it('should get a statusCode 404 if request failed', async () => {
     const mockRequest = {} as Request;
     mockRequest.body = {
       emailPhone: 'batista@sugardaddy.com',
@@ -198,8 +210,10 @@ describe('Test Login function', () => {
     };
 
     const response = mockResponse();
-    User.findOne = jest.fn();
+    const userRepository = connection.getRepository(User);
+
+    userRepository.findOne = jest.fn();
     const res = await userController.login(mockRequest, response);
-    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.status).toHaveBeenCalledWith(404);
   });
 });
