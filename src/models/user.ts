@@ -25,4 +25,7 @@ export class User {
 
     @Column({nullable: true})
     city?: string;
+
+    @Column({nullable: true})
+    superAdmin?: boolean;
 }

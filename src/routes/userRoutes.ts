@@ -17,4 +17,8 @@ userRoutes.post('/login', (req: Request, res: Response) => {
   userController.login(req, res);
 });
 
+userRoutes.put('/', (req: Request, res: Response) => {
+  userController.updateUser(req, res);
+});
+
 export default userRoutes;

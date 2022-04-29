@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { User } from '../models/user';
+import { Token } from '../models/token';
 
 export const connection = new DataSource({
   type: 'postgres',
@@ -8,7 +9,7 @@ export const connection = new DataSource({
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  entities: [User],
+  entities: [User, Token],
   synchronize: true,
   logging: false,
   extra: process.env.POSTGRES_HOST

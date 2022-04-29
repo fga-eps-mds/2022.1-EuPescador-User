@@ -6,7 +6,7 @@ import { connection } from '../../src/config/database';
 
 const userController = new UserController();
 const userMock = {
-  id: '3472417428',
+  id: 1,
   email: 'natan@gmail.com',
   password: '123',
   phone: '56565777',
@@ -168,12 +168,25 @@ describe('Test Login function', () => {
   it('should get a statusCode 200 if login with the right data', async () => {
     const mockRequest = {} as Request;
     mockRequest.body = {
-      emailPhone: 'batista@sugardaddy.com',
+      id: 1,
+      email: 'natan@gmail.com',
       password: '123',
+      phone: '56565777',
+      name: 'Jerson',
+      state: 'Goias',
+      city: 'Rio Verde',
+      admin: true,
+      token: 'mockCode',
     };
 
     const response = mockResponse();
     const userRepository = connection.getRepository(User);
+    userRepository.findOne = jest.fn();
+    jest
+      .spyOn(userRepository, 'save')
+      .mockImplementationOnce(() => Promise.resolve({ id: 1 }));
+    await userController.createUser(mockRequest, response);
+
 
     userRepository.findOne = jest.fn().mockImplementationOnce(() => ({
       select: jest.fn().mockResolvedValueOnce(userMock),
