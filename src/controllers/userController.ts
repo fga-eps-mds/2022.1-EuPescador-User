@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { Request, Response } from 'express';
 import AuthUser from '../middleware/authUser';
 import { connection } from '../config/database';
@@ -6,10 +7,11 @@ import { User } from '../models/user';
 export default class UserController {
   createUser = async (req: Request, res: Response) => {
     try {
-      const { name, email, phone, admin, password, state, city, superAdmin } = await req.body;
+      const { name, email, phone, admin, password, state, city, superAdmin } =
+        await req.body;
       const userRepository = connection.getRepository(User);
-      const emailFind = await userRepository.findOne({where: {email}});
-      const phoneFind = await userRepository.findOne({where: {phone}});
+      const emailFind = await userRepository.findOne({ where: { email } });
+      const phoneFind = await userRepository.findOne({ where: { phone } });
 
       if (emailFind || phoneFind) {
         return res.status(409).json({
@@ -27,7 +29,7 @@ export default class UserController {
       user.admin = admin;
       user.phone = phone;
       user.superAdmin = superAdmin;
-      
+
       if (
         user.admin &&
         req.body.token !== process.env.RESEARCHER_CONFIRMATION_CODE
@@ -45,7 +47,7 @@ export default class UserController {
           .status(401)
           .json({ message: 'Código de administrador invalido!' });
       }
-      
+
       await userRepository.save(user);
 
       return res.status(200).json(user);

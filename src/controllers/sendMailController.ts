@@ -1,9 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { Request, Response } from 'express';
+import { FindOptionsWhere } from 'typeorm';
 import { sendMailService } from '../services/sendMailService';
 import { connection } from '../config/database';
 import { User } from '../models/user';
 import { Token } from '../models/token';
-import { FindOptionsWhere } from 'typeorm';
 
 export default class SendMailController {
   async sendMail(req: Request, res: Response) {
@@ -34,7 +35,7 @@ export default class SendMailController {
       const tokenRepository = connection.getRepository(Token);
 
       const isTokenExists = await tokenRepository.findOne({
-        where: { value: value },
+        where: { value },
       });
 
       if (isTokenExists) {
@@ -42,11 +43,10 @@ export default class SendMailController {
         return res
           .status(200)
           .json({ message: 'Token encontrado!', token: isTokenExists });
-      } else {
-        return res.status(404).json({
-          message: 'Token não encontado!',
-        });
       }
+      return res.status(404).json({
+        message: 'Token não encontado!',
+      });
     } catch (error) {
       return res.status(500).json({
         message:

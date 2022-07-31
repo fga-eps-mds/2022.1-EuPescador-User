@@ -1,13 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable camelcase */
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('token')
 export class Token {
-  @PrimaryGeneratedColumn("increment")
+  @PrimaryGeneratedColumn('increment')
   id?: number;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   value?: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   user_id?: string;
 }

@@ -187,7 +187,6 @@ describe('Test Login function', () => {
       .mockImplementationOnce(() => Promise.resolve({ id: 1 }));
     await userController.createUser(mockRequest, response);
 
-
     userRepository.findOne = jest.fn().mockImplementationOnce(() => ({
       select: jest.fn().mockResolvedValueOnce(userMock),
     }));

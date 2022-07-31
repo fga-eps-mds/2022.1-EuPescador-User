@@ -1,8 +1,9 @@
+/* eslint-disable import/prefer-default-export */
 import nodemailer, { Transporter } from 'nodemailer';
 import { generateToken } from '../utils/generateToken';
 
 export async function sendMailService(email: string) {
-  let token = generateToken();
+  const token = generateToken();
   const html = `
     <p>Olá! Para recuperar sua senha utilize este token no seu aplicativo: <b>${token}</b></p>
     <p>Caso você não tenha feito essa solicitação, apenas ignore esse e-mail.</p>
@@ -11,7 +12,7 @@ export async function sendMailService(email: string) {
     <b>Equipe EuPescador</b>
   `;
 
-  let transporter: Transporter = nodemailer.createTransport({
+  const transporter: Transporter = nodemailer.createTransport({
     name: 'smtp.gmail.com',
     host: 'smtp.gmail.com',
     port: 587,

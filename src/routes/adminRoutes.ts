@@ -6,11 +6,11 @@ const adminRoutes = Router();
 const adminController = new AdminController();
 
 adminRoutes.delete('/:id', (req: Request, res: Response) => {
-    adminController.deleteUser(req, res);
+  adminController.deleteUser(req, res);
 });
 
 adminRoutes.put('/', (req: Request, res: Response) => {
-    adminController.editUser(req, res);
+  adminController.editUser(req, res);
 });
 
 export default adminRoutes;

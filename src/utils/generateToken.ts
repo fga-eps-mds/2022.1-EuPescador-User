@@ -1,5 +1,8 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable no-plusplus */
 export function generateToken() {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let token = '';
 
   for (let i = 0; i < 6; i++) {

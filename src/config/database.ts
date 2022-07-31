@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import { DataSource } from 'typeorm';
 import { User } from '../models/user';
 import { Token } from '../models/token';

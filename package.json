@@ -22,6 +22,7 @@
   "homepage": "https://github.com/fga-eps-mds/2021.2-Eu-Pescador-User#readme",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
+    "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/jest": "^27.4.1",
     "@types/node": "^17.0.23",
